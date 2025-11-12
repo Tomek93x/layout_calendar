@@ -35,7 +35,6 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: $calendar-gap;
-    // Jeden wiersz, zgodny z StyleLint – bez złamań po '+'!
     width: calc(#{$calendar-columns} * #{$calendar-day-size} + (#{$calendar-columns} - 1) * #{$calendar-gap} + 2 * #{$calendar-padding});
     padding: $calendar-padding;
     background: #fff;
