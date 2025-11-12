@@ -9,15 +9,15 @@ $calendar-num-font: Arial, sans-serif;
 $calendar-hover-bg: #FFBFCB;
 $calendar-hover-up: 20px;
 $calendar-hover-transition: 0.5s;
-
 $calendar-columns: 7;
-$calendar-empty-offset: 2; // <--- TUTAJ wpisz liczbę pustych komórek!
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
 }
+
 body {
   min-height: 100vh;
   display: flex;
@@ -35,13 +35,11 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: $calendar-gap;
+    // Jeden wiersz, zgodny z StyleLint – bez złamań po '+'!
+    width: calc(#{$calendar-columns} * #{$calendar-day-size} + (#{$calendar-columns} - 1) * #{$calendar-gap} + 2 * #{$calendar-padding});
     padding: $calendar-padding;
     background: #fff;
     box-sizing: border-box;
-    width: calc(
-      #{$calendar-columns} * #{$calendar-day-size} +
-      (#{$calendar-columns} - 1) * #{$calendar-gap}
-    );
   }
 
   &__day {
@@ -60,10 +58,9 @@ body {
       box-shadow $calendar-hover-transition;
     cursor: default;
 
-    // Numery dla nie-pustych komórek
     @for $i from 1 through 31 {
-      &:nth-child(#{$i + $calendar-empty-offset}):not(.calendar__day--empty)::before {
-        content: "#{$i}";
+      &:nth-child(#{$i})::before {
+        content: '#{$i}';
         color: $calendar-num-color;
         font-size: $calendar-num-size;
         font-family: $calendar-num-font;
@@ -73,18 +70,18 @@ body {
       }
     }
 
-    // Ukryj dni > month-length
+    // Ukrywanie dni po długości miesiąca
     @for $ml from 28 through 31 {
       .calendar--month-length-#{$ml} & {
         @for $d from ($ml + 1) through 31 {
-          &:nth-child(#{$d + $calendar-empty-offset}) {
+          &:nth-child(#{$d}) {
             display: none;
           }
         }
       }
     }
 
-    &:hover:not(.calendar__day--empty) {
+    &:hover {
       background: $calendar-hover-bg;
       cursor: pointer;
       transform: translateY(-$calendar-hover-up);
@@ -92,11 +89,17 @@ body {
     }
   }
 
-  &__day--empty {
-    background: transparent;
-    border: none;
-    pointer-events: none;
-    box-shadow: none;
-    cursor: default;
+  // Modyfikatory start-day przez @each
+  @each $name, $col in (mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6) {
+    &--start-day-#{$name} {
+      .calendar__day:first-child {
+        margin-left: calc(#{$col} * (#{$calendar-day-size} + #{$calendar-gap}));
+      }
+    }
   }
+}
+
+// Reset margin dla innych dni
+.calendar__day:not(:first-child) {
+  margin-left: 0 !important;
 }
